@@ -1,22 +1,13 @@
-import React, { useState } from 'react'
-import { snacks } from '../../data';
-import Card from './card';
-import { useDataContext } from '../context/context';
+import React, { useState } from "react";
+import { snacks } from "../../data";
+import Card from "./card";
 
 function ProductCard() {
-
-  const {} = useDataContext()
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState(snacks);
-  const [sortOrder,setSortOrder] = useState(false)
-  const [sortName, setSortName] = useState(false);
-  const [sortProductWeight, setSortProductWeight] = useState(false);
-  const [sortPrice, setSortPrice] = useState(false);
-  const [calorieSort, setCaloriesSort] = useState(false);
-  const [ingredientsSort, setIngredientsSort] = useState(false);
+  const [sortOrder, setSortOrder] = useState(false);
 
   const handleSearch = (event) => {
-  
     setSearchTerm(event?.target?.value);
 
     const results = snacks.filter(
@@ -33,31 +24,30 @@ function ProductCard() {
   };
 
   const handleSort = () => {
-    const sortedData = [...searchResults]
-    sortedData.sort((a,b)=> sortOrder?a.id-b.id:b.id-a.id)
-    setSearchResults(sortedData)
+    const sortedData = [...searchResults];
+    sortedData.sort((a, b) => (sortOrder ? a.id - b.id : b.id - a.id));
+    setSearchResults(sortedData);
   };
-    const handlePriceSort = () => {
-      const sortedData = [...searchResults];
-      sortedData.sort((a, b) => {
-        if (sortPrice) {
-          return a.price - b.price;
-        } else {
-          return b.price - a.price;
-        }
-      });
-      setSearchResults(sortedData);
-    };
 
+  const handlePriceSort = () => {
+    const sortedData = [...searchResults];
+    sortedData.sort((a, b) => {
+      if (sortOrder) {
+        return a.price - b.price;
+      } else {
+        return b.price - a.price;
+      }
+    });
+    setSearchResults(sortedData);
+  };
 
-  const  handleNameSort = ()=> {
+  const handleNameSort = () => {
     const sortedResults = [...searchResults];
     sortedResults.sort((a, b) => {
-
       const nameA = a.product_name.toLowerCase();
       const nameB = b.product_name.toLowerCase();
 
-      if (sortName) {
+      if (sortOrder) {
         if (nameA < nameB) return -1;
         if (nameA > nameB) return 1;
         return 0;
@@ -67,14 +57,12 @@ function ProductCard() {
         return 0;
       }
     });
-    setSearchResults(sortedResults)
-  }
+    setSearchResults(sortedResults);
+  };
   const handleProductWeightSort = () => {
-    const sortedResults = [...searchResults]
+    const sortedResults = [...searchResults];
     sortedResults.sort((a, b) => {
-      if (sortProductWeight) {
-   
-
+      if (sortOrder) {
         return (
           Number(a.product_weight.slice(0, -1)) -
           Number(b.product_weight.slice(0, -1))
@@ -86,41 +74,31 @@ function ProductCard() {
         );
       }
     });
-        setSearchResults(sortedResults);
-
-  }
+    setSearchResults(sortedResults);
+  };
   const handleCalorieSort = () => {
     const sortedData = [...searchResults];
     sortedData.sort((a, b) => {
-      if (calorieSort) {
+      if (sortOrder) {
         return a.calories - b.calories;
       } else {
         return b.calories - a.calories;
       }
     });
     setSearchResults(sortedData);
-  }
+  };
 
   const handleIngredientsSort = () => {
     const sortedResults = [...searchResults];
-
-   sortedResults.sort((a, b) => {
-     const firstIngredientA = a.ingredients[0].toLowerCase();
-     const firstIngredientB = b.ingredients[0].toLowerCase();
-
-     if (ingredientsSort){
-       return firstIngredientA.localeCompare(firstIngredientB);
-
-     }else {
-       return firstIngredientB.localeCompare(firstIngredientA);
-
-     }
-   });
-
-  //  console.log(sortedResults);
+    sortedResults.sort((a, b) => {
+      const firstIngredientA = a.ingredients[0].toLowerCase();
+      const firstIngredientB = b.ingredients[0].toLowerCase();
+     return sortOrder
+        ? firstIngredientA.localeCompare(firstIngredientB)
+        : firstIngredientB.localeCompare(firstIngredientA);
+    });
     setSearchResults(sortedResults);
-
-  }
+  };
   return (
     <div>
       <input
@@ -134,67 +112,59 @@ function ProductCard() {
           <th
             onClick={() => {
               handleSort();
-              setSortOrder(!sortOrder);
+              setSortOrder((sortOrder) => !sortOrder);
             }}
           >
-            ID
+            ID ⇅
           </th>
           <th
             onClick={() => {
               handleNameSort();
-              setSortName(!sortName);
+              setSortOrder((sortOrder) => !sortOrder);
             }}
           >
-            Product Name
+            Product Name ⇅
           </th>
           <th
             onClick={() => {
               handleProductWeightSort();
-              setSortProductWeight(!sortProductWeight);
+              setSortOrder((sortOrder) => !sortOrder);
             }}
           >
-            Product Weight
+            Product Weight ⇅
           </th>
           <th
             onClick={() => {
               handlePriceSort();
-              setSortPrice(!sortPrice);
+              setSortOrder((sortOrder) => !sortOrder);
             }}
           >
-            Price (INR){" "}
+            Price (INR) ⇅
           </th>
           <th
             onClick={() => {
               handleCalorieSort();
-              setCaloriesSort(!calorieSort);
+              setSortOrder((sortOrder) => !sortOrder);
             }}
           >
-            Calories
+            Calories ⇅
           </th>
           <th
             onClick={() => {
               handleIngredientsSort();
-              setIngredientsSort(!ingredientsSort);
+              setSortOrder((sortOrder) => !sortOrder);
             }}
           >
-            Ingredients
+            Ingredients ⇅
           </th>
         </tr>
-        <tr>
-          <Card snack={searchResults[0] ?? []} />
-        </tr>
-        <tr>
-          <Card snack={searchResults[1] ?? []} />
-        </tr>
-        <tr>
-          <Card snack={searchResults[2] ?? []} />
-        </tr>
-        <tr>
-          <Card snack={searchResults[3] ?? []} />
-        </tr>
+
+        {searchResults.map((item) => {
+          return <Card key={item.id} snack={item ?? []} />;
+        })}
       </table>
     </div>
   );
 }
 
-export default ProductCard
+export default ProductCard;
